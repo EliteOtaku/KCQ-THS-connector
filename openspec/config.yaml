@@ -1,0 +1,51 @@
+schema: spec-driven
+
+# Project context (optional)
+# This is shown to AI when creating artifacts.
+# Add your tech stack, conventions, style guides, domain knowledge, etc.
+context: |
+  KCQ-THS-connector — KCQ 的同花顺（fuyao）日线行情连接器。
+
+  Tech stack: Python 3.12, FastAPI, uvicorn, httpx, uv, pytest.
+  Consumer: KCQ-NexusAI (pnpm monorepo) 的 core 行情层经 market-data V1 协议消费本服务。
+
+  Domain:
+  - 同花顺端外（X-api-key）**只提供日线级行情**：A 股分钟线/分时"未开放外部接入"
+    （返回 code=2004），期货与期权端外仅有日线。故本服务只声明并只提供 daily。
+  - 上游业务错误 HTTP 状态码恒为 200，错误经响应信封 code 表达；本服务对外则必须
+    用非 2xx 表达错误（见 v1-market-data-rest 规格），两套语义不可混淆。
+  - 五个数据域（A股/指数/ETF/期货/期权）**不可混用**：端点、时间字段名
+    （date_ms vs timestamp）、周期参数名（interval vs time_period）、复权支持与否
+    各不相同；跨域请求会返回 1002 Unknown thscode。
+  - 成交量量纲因域而异：A股/指数/ETF 为「股」，期货/期权为「手」；KCQ 内置兜底会把
+    CN 非指数品种当「手」，故本服务必须显式返回 volumeUnit。
+  - 上游 1002 有歧义（既表示参数格式错误也表示未知标的），必须读 message 消歧。
+  - 职责边界：本服务是同花顺域特异的唯一适配点；下游禁止直连上游、禁止自行做域路由、
+    量纲判断或游标翻译。
+
+  Conventions:
+  - 注释正文用中文，技术用语保留英文；每个模块/函数有职责注释。
+  - httpx 只允许出现在 app/upstream.py，其他模块禁止直接 import httpx。
+  - 全部可调参数集中在 app/config.py（env → Settings），禁止散落 os.environ。
+  - API Key 只从 THS_API_KEY 或 ~/.cloudtrade/config.json 读取，禁止硬编码或入库。
+  - 测试用 FakeUpstream 替身，pytest 全量回归且不访问网络。
+  - Conventional Commits（无前缀）。
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+rules:
+  proposal:
+    - Keep proposals under 500 words
+    - Always include a "Non-goals" section
+  spec:
+    - Requirements use RFC 2119 style SHALL; each requirement has at least one #### Scenario block
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+operations:
+  apply:
+    guidance:
+      - Run `uv run pytest` after each task; tests must pass without network access
+  archive:
+    guidance:
+      - Summarize the archive outcome before finishing

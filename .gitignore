@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# uv（与 KCQ-MT5-connector 约定一致：不跟踪 uv.lock）
+uv.lock
+
+# 测试与缓存
+.pytest_cache/
+.coverage
+
+# 日志与本地产物
+*.log
+.idea/
+.vscode/

@@ -1,0 +1,26 @@
+[project]
+name = "kcq-ths-connector"
+version = "0.1.0"
+description = "KCQ 同花顺(fuyao)日线行情连接器，实现 KCQ market-data V1 协议"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "httpx>=0.27",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.uv]
+package = false
