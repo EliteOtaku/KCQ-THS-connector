@@ -133,7 +133,7 @@ KCQ `SOURCE_REJECTION_CODES = ['UNSUPPORTED_CAPABILITY', 'INSTRUMENT_NOT_FOUND']
 
 ```ts
 // CN 会话且非指数 → 'lot'（手）
-instrument.sessionId === 'CN' && instrument.assetClass !== 'index' ? 'lot' : undefined
+instrument.sessionId === 'CN' && instrument.instrumentType !== 'index' ? 'lot' : undefined
 ```
 
 而 THS 的 A 股 `volume` 是**股**。若 connector 不显式返回 `volumeUnit`，
@@ -194,9 +194,9 @@ KCQ `MarketSessionRegistry` **已内置** `CN/HK/KR/US/MT5`：
 | `asset_type` | 按类型过滤 |
 | `limit` / `offset` | 分页 |
 
-### 7.3 `asset_type` → KCQ `AssetClass` 映射
+### 7.3 `asset_type` → KCQ `InstrumentType` 映射
 
-| 上游 `asset_type` | KCQ `AssetClass` |
+| 上游 `asset_type` | KCQ `InstrumentType` |
 |---|---|
 | `a-share` | `stock` |
 | `a-share-index` | `index` |
@@ -205,10 +205,10 @@ KCQ `MarketSessionRegistry` **已内置** `CN/HK/KR/US/MT5`：
 | `futures` | `future` |
 | `options` | `option` |
 
-> **KCQ `AssetClass` 无 `fund-otc` 对应项**（有 `fund`），故 `fund-otc` → `fund`。
-> 注意 KCQ 的 `ASSET_CLASS_VALUES` 是
+> **KCQ `InstrumentType` 无 `fund-otc` 对应项**（有 `fund`），故 `fund-otc` → `fund`。
+> 注意 KCQ 的 `INSTRUMENT_TYPE_VALUES` 是
 > `stock|index|fund|etf|future|option|forex|crypto|unknown`，
-> **没有 `fund-otc` 这种值**，写错会被 `isFilterableAssetClass` 过滤掉。
+> **没有 `fund-otc` 这种值**，写错会被 `isFilterableInstrumentType` 过滤掉。
 
 ---
 

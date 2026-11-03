@@ -49,7 +49,7 @@ async def probe(source_id: str, request: Request):
 
     settings = _get_settings(request)
     capabilities = {
-        "assetClasses": ["stock", "index", "etf", "fund", "future", "option"],
+        "instrumentTypes": ["stock", "index", "etf", "fund", "future", "option"],
         "bars": {"periods": ["daily"], "adjustments": ["none", "qfq", "hfq"]},
         "tradingCalendar": True,
     }
@@ -97,7 +97,7 @@ async def search_instruments(request: Request):
         upstream,
         keyword=str(body.get("keyword", "") or ""),
         limit=int(body.get("limit", 20) or 20),
-        asset_classes=list(body.get("assetClasses") or []) or None,
+        instrument_types=list(body.get("instrumentTypes") or []) or None,
     )
     return ok(result)
 
