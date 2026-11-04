@@ -7,7 +7,7 @@ from app import catalog
 
 
 @pytest.mark.parametrize(
-    ("asset_type", "expected_class"),
+    ("asset_type", "expected_instrument_type"),
     [
         ("a-share", "stock"),
         ("a-share-index", "index"),
@@ -19,21 +19,21 @@ from app import catalog
         (None, "unknown"),
     ],
 )
-def test_asset_type_mapping(asset_type, expected_class):
-    """六种上游类型映射到 KCQ AssetClass；未知归 unknown。"""
-    assert catalog.asset_class_of(asset_type) == expected_class
+def test_asset_type_mapping(asset_type, expected_instrument_type):
+    """六种上游类型映射到 KCQ InstrumentType；未知归 unknown。"""
+    assert catalog.instrument_type_of(asset_type) == expected_instrument_type
 
 
-def test_kcq_asset_class_values_are_legal():
+def test_kcq_instrument_type_values_are_legal():
     """映射结果必须落在 KCQ 合法值域内（否则会被静默过滤）。"""
     legal = {"stock", "index", "fund", "etf", "future", "option", "forex", "crypto", "unknown"}
     for asset_type in ["a-share", "a-share-index", "fund-etf", "fund-otc", "futures",
                        "options", "nope", None]:
-        assert catalog.asset_class_of(asset_type) in legal
+        assert catalog.instrument_type_of(asset_type) in legal
 
 
 @pytest.mark.parametrize(
-    ("asset_class", "expected_session"),
+    ("instrument_type", "expected_session"),
     [
         ("stock", "CN"),
         ("index", "CN"),
@@ -44,13 +44,13 @@ def test_kcq_asset_class_values_are_legal():
         ("unknown", None),
     ],
 )
-def test_session_id_mapping(asset_class, expected_session):
+def test_session_id_mapping(instrument_type, expected_session):
     """复用 KCQ 内置 CN 会话；期货/期权时段不同，留空。"""
-    assert catalog.session_id_of(asset_class) == expected_session
+    assert catalog.session_id_of(instrument_type) == expected_session
 
 
 @pytest.mark.parametrize(
-    ("asset_class", "expected"),
+    ("instrument_type", "expected"),
     [
         ("stock", ["none", "qfq", "hfq"]),
         ("index", ["none"]),
@@ -59,9 +59,9 @@ def test_session_id_mapping(asset_class, expected_session):
         ("option", ["none"]),
     ],
 )
-def test_adjustments_mapping(asset_class, expected):
+def test_adjustments_mapping(instrument_type, expected):
     """仅 A 股支持复权。"""
-    assert catalog.adjustments_of(asset_class) == expected
+    assert catalog.adjustments_of(instrument_type) == expected
 
 
 def test_build_descriptor_structure():
@@ -80,7 +80,7 @@ def test_build_descriptor_structure():
     assert descriptor["sourceId"] == "ths"
     assert descriptor["symbol"] == "600519.SH"
     assert descriptor["name"] == "贵州茅台"
-    assert descriptor["assetClass"] == "stock"
+    assert descriptor["instrumentType"] == "stock"
     assert descriptor["exchange"] == "SH"
     assert descriptor["currency"] == "CNY"
     assert descriptor["sessionId"] == "CN"
@@ -127,7 +127,7 @@ async def test_search_returns_descriptors(fake_upstream):
     assert result["items"][0]["id"] == "ths:600519.SH"
 
 
-async def test_search_filters_by_asset_class_locally(fake_upstream):
+async def test_search_filters_by_instrument_type_locally(fake_upstream):
     """上游不支持类别过滤 → 本地过滤。"""
     fake_upstream.set_response(
         catalog.PATH_SEARCH,
@@ -141,7 +141,7 @@ async def test_search_filters_by_asset_class_locally(fake_upstream):
         },
     )
     result = await catalog.search_instruments(
-        fake_upstream, keyword="x", limit=20, asset_classes=["index"]
+        fake_upstream, keyword="x", limit=20, instrument_types=["index"]
     )
     assert [d["id"] for d in result["items"]] == ["ths:000300.SH"]
 

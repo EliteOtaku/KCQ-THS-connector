@@ -37,24 +37,24 @@ SHALL NOT 通过返回伪造周期数据来"兼容"请求。
 - **THEN** 返回 400 `UNSUPPORTED_CAPABILITY`（属 `SOURCE_REJECTION_CODES`），
   由 `SourceRouter` 流转到 MT5/gotdx 等支持该周期的源
 
-### Requirement: 资产类别声明覆盖已实现域
+### Requirement: 品种类型声明覆盖已实现域
 
-系统 SHALL 声明 `assetClasses` 为 `["stock","index","etf","fund","future","option"]`，
+系统 SHALL 声明 `instrumentTypes` 为 `["stock","index","etf","fund","future","option"]`，
 即五种已路由的域加上 `fund-otc` 归一后的 `fund`。
 
-#### Scenario: 资产类别
+#### Scenario: 品种类型
 
 - **WHEN** 调用 probe
-- **THEN** `capabilities.assetClasses` 覆盖上述六项
+- **THEN** `capabilities.instrumentTypes` 覆盖上述六项
 
-### Requirement: 品种级能力按资产类别区分复权
+### Requirement: 品种级能力按品种类型区分复权
 
-系统 SHALL 在品种描述符的 `capabilities.bars.adjustments` 中按资产类别声明复权能力：
+系统 SHALL 在品种描述符的 `capabilities.bars.adjustments` 中按品种类型声明复权能力：
 `stock` 为 `["none","qfq","hfq"]`，其余为 `["none"]`。
 
 #### Scenario: A 股可复权
 
-- **WHEN** 描述符对应 `assetClass=stock`
+- **WHEN** 描述符对应 `instrumentType=stock`
 - **THEN** `capabilities.bars.adjustments` 为 `["none","qfq","hfq"]`
 
 #### Scenario: 非 A 股不可复权

@@ -229,11 +229,11 @@ class ThsApiError(Exception):
 
 ### 7.1 检索
 
-`search(source_id, keyword, limit, asset_classes)` →
+`search(source_id, keyword, limit, instrument_types)` →
 `GET /api/meta/tickers/search?q=<keyword>&limit=<limit>`
 
 - 上游 `q` 必填；`keyword` 为空时**直接返回空列表**，不要打上游（避免 1001）。
-- 上游不支持按 `asset_classes` 过滤 → 取回后**在本地过滤**（见 §7.3）。
+- 上游不支持按 `instrument_types` 过滤 → 取回后**在本地过滤**（见 §7.3）。
 
 `list_tickers(asset_type, limit, offset)` →
 `GET /api/meta/tickers/list?asset_type=…&limit=…&offset=…`
@@ -246,7 +246,7 @@ class ThsApiError(Exception):
   "sourceId": "ths",
   "symbol": thscode,               # 用完整 thscode（含后缀）
   "name": name,
-  "assetClass": <见 §7.3>,
+  "instrumentType": <见 §7.3>,
   "exchange": exchange or "",      # 上游可能为 null → 用 ""
   "sessionId": <见 §7.4>,
   "currency": currency or None,
@@ -257,7 +257,7 @@ class ThsApiError(Exception):
 
 `providerRef` 是**唯一路由依据**（KCQ 原样带回），必须带 `thscode` 与 `assetType`。
 
-### 7.3 `asset_type` → KCQ `AssetClass`（**KCQ 无 `fund-otc`**）
+### 7.3 `asset_type` → KCQ `InstrumentType`（**KCQ 无 `fund-otc`**）
 
 | 上游 | KCQ |
 |---|---|
@@ -270,7 +270,7 @@ class ThsApiError(Exception):
 | 其他 | `unknown` |
 
 KCQ 合法值仅：`stock|index|fund|etf|future|option|forex|crypto|unknown`。
-**写错会被 `isFilterableAssetClass` 静默过滤掉。**
+**写错会被 `isFilterableInstrumentType` 静默过滤掉。**
 
 ### 7.4 `sessionId`
 
@@ -440,7 +440,7 @@ KCQ 的 `httpTransport.ts:86-99` **只在 `!res.ok` 分支解析错误信封**�
   "checkedAt": 1791716283000,
   "latencyMs": 42,
   "capabilities": {
-    "assetClasses": ["stock","index","etf","fund","future","option"],
+    "instrumentTypes": ["stock","index","etf","fund","future","option"],
     "bars": {"periods": ["daily"], "adjustments": ["none","qfq","hfq"]},
     "tradingCalendar": true
   }

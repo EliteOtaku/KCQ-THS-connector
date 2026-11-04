@@ -58,7 +58,7 @@ trading-calendar / timeshare），让前端 core 行情层把本连接器当作�
 ### Requirement: 品种检索映射为协议描述符
 
 系统 SHALL 提供 `POST /api/v1/market-data/instruments/search`，把上游
-`asset_type` 映射为 KCQ `AssetClass`（`a-share`→`stock`、`a-share-index`→`index`、
+`asset_type` 映射为 KCQ `InstrumentType`（`a-share`→`stock`、`a-share-index`→`index`、
 `fund-etf`→`etf`、`fund-otc`→`fund`、`futures`→`future`、`options`→`option`，
 其余→`unknown`），且描述符 SHALL 携带
 `providerRef={thscode, assetType}` 作为唯一路由依据。
@@ -72,8 +72,8 @@ trading-calendar / timeshare），让前端 core 行情层把本连接器当作�
 
 #### Scenario: 类别过滤
 
-- **WHEN** 请求携带 `assetClasses`
-- **THEN** 上游不支持该过滤，连接器在本地按映射后的 `assetClass` 过滤
+- **WHEN** 请求携带 `instrumentTypes`
+- **THEN** 上游不支持该过滤，连接器在本地按映射后的 `instrumentType` 过滤
 
 #### Scenario: 空关键字
 
