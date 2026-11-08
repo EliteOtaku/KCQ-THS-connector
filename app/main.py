@@ -42,12 +42,14 @@ def create_app(settings: Settings | None = None, upstream: ThsUpstream | None = 
 
     app = FastAPI(title="KCQ-THS-connector", lifespan=lifespan)
 
-    # 与 GoTDX/MT5 一致：允许 5175 等本地前端直连
+    # 与 GoTDX/MT5 一致：允许本地前端与公开页面跨源直连；
+    # allow_private_network 放行 Chrome 对「公开页面 → 127.0.0.1」的 PNA 预检。
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
         allow_methods=["*"],
         allow_headers=["*"],
+        allow_private_network=True,
     )
 
     app.include_router(router)
