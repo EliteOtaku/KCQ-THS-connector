@@ -154,6 +154,20 @@ def test_cors_header_present(client, fake_upstream):
     assert response.headers.get("access-control-allow-origin") == "*"
 
 
+def test_private_network_access_preflight(client, fake_upstream):
+    """公开页面直连本机时 Chrome 的 PNA 预检需要允许头。"""
+    response = client.options(
+        "/health/live",
+        headers={
+            "Origin": "https://363045841.github.io",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Private-Network": "true",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-private-network") == "true"
+
+
 def test_bars_instrument_not_found_passes_through(client, fake_upstream):
     """上游 1002 Unknown thscode → 404 + INSTRUMENT_NOT_FOUND（可流转）。"""
     from app.envelope import UpstreamEnvelope
